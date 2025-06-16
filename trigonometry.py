@@ -1,20 +1,28 @@
 import math
 import re
 
-def solve_trigonometry(expr):
-    expr = expr.lower().replace(" ", "")
+def solve_trigonometry(question):
+    try:
+        question = question.lower().replace("°", "")
 
-    if "sin" in expr:
-        angle = float(re.findall(r"sin\((\d+)\)", expr)[0])
-        return round(math.sin(math.radians(angle)), 4)
+        match = re.search(r'(sin|cos|tan)\s*\(?(\d+)\)?', question)
+        if not match:
+            return "Could not parse the trigonometric function."
 
-    elif "cos" in expr:
-        angle = float(re.findall(r"cos\((\d+)\)", expr)[0])
-        return round(math.cos(math.radians(angle)), 4)
+        func, angle = match.groups()
+        angle = float(angle)
+        radians = math.radians(angle)
 
-    elif "tan" in expr:
-        angle = float(re.findall(r"tan\((\d+)\)", expr)[0])
-        return round(math.tan(math.radians(angle)), 4)
+        if func == "sin":
+            result = math.sin(radians)
+        elif func == "cos":
+            result = math.cos(radians)
+        elif func == "tan":
+            result = math.tan(radians)
+        else:
+            return "Function not supported."
 
-    else:
-        return "Unrecognized trigonometric expression."
+        return f"{func}({angle}°) = {result:.4f}"
+
+    except Exception as e:
+        return f"Error solving trigonometry question: {str(e)}"
