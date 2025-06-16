@@ -3,59 +3,58 @@ from solver.algebra import solve_equation
 from solver.geometry import solve_geometry
 from solver.trigonometry import solve_trigonometry
 from solver.image_solver import extract_text_from_image
-from PIL import Image
 
-st.set_page_config(page_title="Mubashar AI Math Calculator", layout="centered")
+st.set_page_config(page_title="AI Math Calculator by Mubashar", layout="centered")
 
-st.title("📚 Mubashar's AI Math Calculator 🤖")
-st.markdown("""
-Welcome to the **AI Math Calculator by Mubashar Ul Hassan**.
-This app can solve:
-- Algebra equations
-- Geometry problems
-- Trigonometry questions
-- Image-based math queries
-""")
+st.markdown(
+    """
+    <h1 style='text-align: center; color: #2E86C1;'>🧮 AI Math Calculator by Mubashar</h1>
+    <h4 style='text-align: center; color: #555;'>Solve Algebra, Geometry, Trigonometry & MCQs — Text & Image Based</h4>
+    <hr style='border: 1px solid #2E86C1;'/>
+    """,
+    unsafe_allow_html=True
+)
 
-# Tabs for each type
-tab1, tab2, tab3, tab4 = st.tabs(["🔢 Algebra", "📐 Geometry", "📈 Trigonometry", "🖼️ Image Solver"])
+# User Input Method
+method = st.radio("Select Input Method:", ["📝 Type Question", "🖼️ Upload Image"])
 
-with tab1:
-    st.subheader("🧮 Algebra Solver")
-    question = st.text_input("Enter your algebraic equation (e.g., 2x + 3 = 7)")
-    if st.button("Solve Algebra"):
-        try:
+if method == "📝 Type Question":
+    question = st.text_area("Enter your math question:", height=150)
+
+    if st.button("🔍 Solve"):
+        if "sin" in question or "cos" in question or "tan" in question:
+            result = solve_trigonometry(question)
+        elif any(shape in question.lower() for shape in ["area", "perimeter", "circle", "rectangle", "triangle"]):
+            result = solve_geometry(question)
+        else:
             result = solve_equation(question)
-            st.success(f"✅ Answer: {result}")
-        except Exception as e:
-            st.error("❌ Error: Couldn't solve the algebraic equation.")
 
-with tab2:
-    st.subheader("📏 Geometry Solver")
-    geo_question = st.text_input("Enter a geometry problem (e.g., area of circle with radius 5)")
-    if st.button("Solve Geometry"):
-        result = solve_geometry(geo_question)
-        st.success(f"✅ Answer: {result}")
+        st.markdown("### 🧠 Answer:")
+        st.success(result)
 
-with tab3:
-    st.subheader("📐 Trigonometry Solver")
-    trig_question = st.text_input("Enter a trigonometry expression (e.g., sin(30))")
-    if st.button("Solve Trigonometry"):
-        result = solve_trigonometry(trig_question)
-        st.success(f"✅ Answer: {result}")
+elif method == "🖼️ Upload Image":
+    uploaded_file = st.file_uploader("Upload Image Containing Math Question", type=["jpg", "png", "jpeg"])
 
-with tab4:
-    st.subheader("🖼️ Upload Image of Math Problem")
-    uploaded_image = st.file_uploader("Upload PNG/JPG image", type=["png", "jpg", "jpeg"])
-    if uploaded_image:
-        st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
+    if uploaded_file is not None:
+        st.image(uploaded_file, caption="Uploaded Question", use_column_width=True)
+        question = extract_text_from_image(uploaded_file)
 
-        if st.button("🧠 Extract & Solve"):
-            extracted = extract_text_from_image(uploaded_image)
-            st.info(f"📝 Extracted: {extracted}")
+        st.markdown("### 📝 Extracted Question:")
+        st.info(question)
 
-            try:
-                result = solve_equation(extracted)
-                st.success(f"✅ Answer: {result}")
-            except:
-                st.warning("⚠️ Could not solve extracted text.")
+        if st.button("🔍 Solve"):
+            if "sin" in question or "cos" in question or "tan" in question:
+                result = solve_trigonometry(question)
+            elif any(shape in question.lower() for shape in ["area", "perimeter", "circle", "rectangle", "triangle"]):
+                result = solve_geometry(question)
+            else:
+                result = solve_equation(question)
+
+            st.markdown("### 🧠 Answer:")
+            st.success(result)
+
+st.markdown("---")
+st.markdown(
+    "<p style='text-align: center; color: gray;'>Made with ❤️ by Mubashar Ul Hassan</p>",
+    unsafe_allow_html=True
+)
